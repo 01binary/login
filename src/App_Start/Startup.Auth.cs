@@ -1,9 +1,13 @@
 ﻿using System;
+using System.Web.Configuration;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
+using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.Google;
+using Microsoft.Owin.Security.Facebook;
+using Microsoft.Owin.Security.Twitter;
 using Owin;
 using login_popup.Models;
 
@@ -50,13 +54,34 @@ namespace login_popup
             //    clientId: "",
             //    clientSecret: "");
 
-            //app.UseTwitterAuthentication(
-            //   consumerKey: "",
-            //   consumerSecret: "");
+            app.UseTwitterAuthentication(new TwitterAuthenticationOptions
+            {
+                // Replace with literal strings containing your secrets OR create ..\..\Secrets.config.
+                ConsumerKey = WebConfigurationManager.AppSettings["twitterAppId"],
+                ConsumerSecret = WebConfigurationManager.AppSettings["twitterAppSecret"],
 
-            //app.UseFacebookAuthentication(
-            //   appId: "",
-            //   appSecret: "");
+                // http://stackoverflow.com/questions/25011890/owin-twitter-login-the-remote-certificate-is-invalid-according-to-the-validati
+                // Also: if you've used Fiddler, clear out all DO_NOT_TRUST_FiddlerRoot certificates from your certificate stores (see README.md).
+                BackchannelCertificateValidator = new CertificateSubjectKeyIdentifierValidator(new[]
+                {
+                    "A5EF0B11CEC04103A34A659048B21CE0572D7D47", // VeriSign Class 3 Secure Server CA - G2
+                    "0D445C165344C1827E1D20AB25F40163D8BE79A5", // VeriSign Class 3 Secure Server CA - G3
+                    "7FD365A7C2DDECBBF03009F34339FA02AF333133", // VeriSign Class 3 Public Primary Certification Authority - G5
+                    "39A55D933676616E73A761DFA16A7E59CDE66FAD", // Symantec Class 3 Secure Server CA - G4
+                    "5168FF90AF0207753CCCD9656462A212B859723B", // DigiCert SHA2 High Assurance Server C‎A 
+                    "B13EC36903F8BF4701D498261A0802EF63642BC3"  // DigiCert High Assurance EV Root CA
+                })
+            });
+
+            app.UseFacebookAuthentication(new FacebookAuthenticationOptions
+            {
+                // Replace with literal strings containing your secrets OR create ..\..\Secrets.config.
+                AppId = WebConfigurationManager.AppSettings["facebookAppId"],
+                AppSecret = WebConfigurationManager.AppSettings["facebookAppSecret"],
+
+                // http://stackoverflow.com/questions/25646055/facebook-popup-login-with-owin
+                Provider = new PopupFacebookProvider()
+            });
 
             //app.UseGoogleAuthentication(new GoogleOAuth2AuthenticationOptions()
             //{

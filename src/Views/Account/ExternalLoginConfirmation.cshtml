@@ -1,6 +1,7 @@
 ﻿@model login_popup.Models.ExternalLoginConfirmationViewModel
 @{
     ViewBag.Title = "Register";
+    Layout = "~/Views/Shared/_Popup.cshtml";
 }
 <h2>@ViewBag.Title.</h2>
 <h3>Associate your @ViewBag.LoginProvider account.</h3>
@@ -27,6 +28,7 @@
     <div class="form-group">
         <div class="col-md-offset-2 col-md-10">
             <input type="submit" class="btn btn-default" value="Register" />
+            <button class="btn btn-danger" onclick="window.result = { success: false }">Cancel</button>
         </div>
     </div>
 }

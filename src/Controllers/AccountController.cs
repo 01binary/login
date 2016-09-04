@@ -325,7 +325,7 @@ namespace login_popup.Controllers
             var loginInfo = await AuthenticationManager.GetExternalLoginInfoAsync();
             if (loginInfo == null)
             {
-                return RedirectToAction("Login");
+                return View("ExternalLoginFailure");
             }
 
             // Sign in the user with this external login provider if the user already has a login
@@ -333,12 +333,8 @@ namespace login_popup.Controllers
             switch (result)
             {
                 case SignInStatus.Success:
-                    return RedirectToLocal(returnUrl);
-                case SignInStatus.LockedOut:
-                    return View("Lockout");
-                case SignInStatus.RequiresVerification:
-                    return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = false });
-                case SignInStatus.Failure:
+                    ViewBag.Name = loginInfo.ExternalIdentity.Name;
+                    return View("ExternalLoginSuccess");
                 default:
                     // If the user does not have an account, then prompt the user to create an account
                     ViewBag.ReturnUrl = returnUrl;
@@ -375,7 +371,10 @@ namespace login_popup.Controllers
                     if (result.Succeeded)
                     {
                         await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
-                        return RedirectToLocal(returnUrl);
+
+                        ViewBag.Name = info.ExternalIdentity.Name;
+
+                        return View("ExternalLoginSuccess");
                     }
                 }
                 AddErrors(result);
@@ -393,6 +392,14 @@ namespace login_popup.Controllers
         {
             AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
             return RedirectToAction("Index", "Home");
+        }
+
+        //
+        // GET: /Account/ExternalLoginSuccess
+        [AllowAnonymous]
+        public ActionResult ExternalLoginSuccess()
+        {
+            return View();
         }
 
         //
